@@ -37,5 +37,4 @@ jobs:
           script_stop: true
           script: |
             cd /home/cfciruxn
-            cd picturepros
-            git pull
+            git clone http://github.com/eldast8sman/picture_pros picture_pros
