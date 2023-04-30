@@ -38,5 +38,3 @@ jobs:
             cd /home/cfciruxn
             cd picturepros
             git pull
-            composer i
-            php artisan migrate --force
