@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use App\Models\User;
 use App\Mail\Mailings;
 use Illuminate\Support\Str;
@@ -88,11 +89,6 @@ class AuthController extends Controller
                     'name' => 'required|string',
                     'email' => 'required|email|string'
                 ]);
-                if(empty($data['password'])){
-                    unset($data['password']);
-                } else {
-                    $data['password'] = bcrypt($data['password']);
-                }
     
                 $user->update($data);
     
@@ -211,4 +207,21 @@ class AuthController extends Controller
             ], 409);
         }
     }
+
+    public function login(LoginRequest $request){
+        if($user = $this->login_function($request->email, $request->password)){
+            return response([
+                'status' => 'success',
+                'message' => 'Login successfully',
+                'data' => $user
+            ], 200);
+        } else {
+            return response([
+                'status' => 'failed',
+                'message' => 'Wrong Login Credentials'
+            ], 409);
+        }
+    }
+
+    public function recover_password
 }
