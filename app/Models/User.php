@@ -21,6 +21,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'auth_level',
+        'verification_token',
+        'verification_token_expiry',
+        'token',
+        'token_expiry',
+        'last_login',
+        'prev_login'
     ];
 
     /**
@@ -30,7 +37,10 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
+        'verification_token',
+        'verification_token_expiry',
+        'token',
+        'token_expiry'
     ];
 
     /**
