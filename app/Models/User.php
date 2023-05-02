@@ -25,9 +25,7 @@ class User extends Authenticatable
         'verification_token',
         'verification_token_expiry',
         'token',
-        'token_expiry',
-        'last_login',
-        'prev_login'
+        'token_expiry'
     ];
 
     /**

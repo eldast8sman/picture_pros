@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ChangePasswordRequest;
 use App\Models\User;
 use App\Mail\Mailings;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\UserActivationRequest;
 
 class AuthController extends Controller
@@ -65,6 +68,38 @@ class AuthController extends Controller
         }
     }
 
+    public function resend_verification_link($id){
+        if($this->user()->auth_level == 1){
+            if(!empty($user = User::find($id))){
+                $token = base64_encode($user->id."PicturePros".Str::random(20));
+                $user->verification_token = $token;
+                $user->verification_token_expiry = date('Y-m-d H:i:s', time() + (60 * 60 * 24));
+                $user->save();
+    
+                Mail::to($user)->send(new Mailings('Invitation to be an Admin on PicturePros', 'emails.invite_admin', [
+                    'title' => 'Invitiation to be an Admin',
+                    'name' => $user->name,
+                    'link' => env('FRONTEND_URL', 'https://picturepros.com').'/admin/activate/'.$token
+                ]));
+                
+                return response([
+                    'status' => 'success',
+                    'message' => 'Invitation/Activation Link sent successfully'
+                ], 200);
+            } else {
+                return response([
+                    'status' => 'failed',
+                    'message' => 'No User was fetched'
+                ], 404);
+            }
+        } else {
+            return response([
+                'status' => 'failed',
+                'message' => 'Not Authorized to carry out this Action'
+            ], 409);
+        }
+    }
+
     public function show($id){
         $user = User::find($id);
         if(!empty($user)){
@@ -82,7 +117,7 @@ class AuthController extends Controller
         }
     }
 
-    public function update(Request $request, $id){
+    public function update(UpdateUserRequest $request, $id){
         if(!empty($user = User::find($id))){
             if(($this->user()->auth_level == 1) || $user->id == $this->user()->id){
                 $data = $request->validate([
@@ -223,5 +258,72 @@ class AuthController extends Controller
         }
     }
 
-    public function recover_password
+    public function recover_password($email){
+        $user = User::where('email', $email)->first();
+        if(!empty($user)){
+            $user->token = md5("PicturePros".$user->id.time().Str::random(30));
+            $user->token_expiry = date('Y-m-d H:i:s', time() + (60 *10));
+            $user->save();
+            Mail::to($user)->send(new Mailings('Password Reset Link', 'emails.reset_password', [
+                'title' => 'Reset your Password',
+                'name' => $user->name,
+                'link' => env('FRONTEND_URL', 'http://localhost:3000').'/password-reset/'.$user->token
+            ]));
+
+            return response([
+                'status' => 'success',
+                'message' => 'Password Reset Link sent to '.$user->email
+            ], 200);
+        } else {
+            return response([
+                'status' => 'failed',
+                'message' => 'No User was fetched'
+            ], 404);
+        }
+    }
+
+    public function reset_password(ResetPasswordRequest $request){
+        $user = User::where('token', $request->token)->first();
+        if($user->token_expiry >= date('Y-m-d H:i:s')){
+            $user->password = bcrypt($request->password);
+            $user->token = null;
+            $user->token_expiry = null;
+            $user->save();
+
+            return response([
+                'status' => 'success',
+                'message' => 'Password reset successfully. You can now login with your credentials'
+            ], 200);
+        } else {
+            $user->token = null;
+            $user->token_expiry = null;
+            $user->save();
+            return response([
+                'status' => 'failed',
+                'message' => 'Expired Link'
+            ], 404);
+        }
+    }
+
+    public function change_password(ChangePasswordRequest $request){
+        $user = $this->user();
+
+        if($user = $this->login_function($user->email, $request->old_password)){
+            $user = User::find($user->id);
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            $user = $this->login_function($user->email, $user->password);
+            return response([
+                'status' => 'success',
+                'message' => 'Password changed successfully',
+                'data' => $user
+            ], 200);
+        } else {
+            return response([
+                'status' => 'failed',
+                'message' => 'Wrong Password'
+            ], 409);
+        }
+    }
 }
