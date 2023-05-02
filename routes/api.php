@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TestimonialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,5 +37,14 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/admins/{id}', 'show');
         Route::put('/admins/{id}', 'update');
         Route::post('/change-password', 'change_password');
+        Route::delete('/admins/{id}', 'destroy');
+    });
+
+    Route::controller(TestimonialController::class)->group(function(){
+        Route::get('/testimonials', 'index');
+        Route::post('/testimonials', 'store');
+        Route::get('/testimonials/{id}', 'show');
+        Route::put('/testimonials/{id}', 'update');
+        Route::delete('/testimonials/{id}', 'destroy');
     });
 });

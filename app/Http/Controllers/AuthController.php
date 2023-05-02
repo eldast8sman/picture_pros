@@ -341,4 +341,28 @@ class AuthController extends Controller
             ], 409);
         }
     }
+
+    public function destroy($id){
+        if($this->user()->auth_level == 1){
+            if(!empty($user = User::find($id))){
+                $user->delete();
+
+                return response([
+                    'status' => 'success',
+                    'message' => 'User successfully deleted',
+                    'data' => $user
+                ], 200);
+            } else {
+                return response([
+                    'status' => 'failed',
+                    'message' => 'User not fetched'
+                ], 409);
+            }
+        } else {
+            return response([
+                'status' => 'failed',
+                'message' => 'You are not authorised to carry out this Action'
+            ], 409);
+        }
+    }
 }
