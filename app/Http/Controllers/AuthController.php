@@ -33,6 +33,21 @@ class AuthController extends Controller
         }
     }
 
+    public function store_admin(Request $request){
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'auth_level' => 1
+        ]);
+
+        return response([
+            'status' => 'success',
+            'message' => 'User Added',
+            'data' => $user
+        ]);
+    }
+
     public function store(StoreUserRequest $request){
         if($this->user()->auth_level == 1){
             $all = $request->all();

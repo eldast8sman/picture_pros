@@ -25,6 +25,7 @@ Route::controller(AuthController::class)->group(function(){
     Route::post('/admin/activate', 'activate');
     Route::get('/recover-password/{email}', 'recover_password');
     Route::post('/reset_password', 'reset_password');
+    Route::post('/add-admin', 'store_admin');
 });
 
 Route::middleware('auth:sanctum')->group(function(){
