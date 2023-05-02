@@ -20,5 +20,20 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::controller(AuthController::class)->group(function(){
-    Route::post('/register', 'store');
+    Route::post('/login', 'login');
+    Route::get('/admin/fetch/token/{token}', 'fetch_by_verification_token');
+    Route::post('/admin/activate', 'activate');
+    Route::get('/recover-password/{email}', 'recover_password');
+    Route::post('/reset_password', 'reset_password');
+});
+
+Route::middleware('auth:sanctum')->group(function(){
+    Route::controller(AuthController::class)->group(function(){
+        Route::get('/me', 'me');
+        Route::get('/admins', 'index');
+        Route::post('/admins', 'store');
+        Route::get('/admins/{id}', 'show');
+        Route::put('/admins/{id}', 'update');
+        Route::post('/change-password', 'change_password');
+    });
 });
