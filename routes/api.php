@@ -47,4 +47,12 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::put('/testimonials/{id}', 'update');
         Route::delete('/testimonials/{id}', 'destroy');
     });
+
+    Route::controller(PhotoGalleryController::class)->group(function(){
+        Route::get('/photos', 'index');
+        Route::post('/photos', 'store');
+        Route::get('/photos/{id}', 'show');
+        Route::put('/photos/{id}', 'update');
+        Route::delete('/photos/{id}', 'destroy');
+    });
 });
