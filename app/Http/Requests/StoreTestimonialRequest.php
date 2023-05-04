@@ -25,6 +25,7 @@ class StoreTestimonialRequest extends FormRequest
             'testimonial' => 'required|string',
             'name' => 'required|string',
             'position' => 'required|string',
+            'rating' => 'required|intger|min:1|max:5',
             'file' => 'required|mimes:png,jpg,jpeg|max:1024'
         ];
     }

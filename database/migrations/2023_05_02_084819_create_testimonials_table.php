@@ -16,6 +16,7 @@ return new class extends Migration
             $table->text('testimonial');
             $table->string('name');
             $table->string('position');
+            $table->integer('rating');
             $table->string('filename');
             $table->timestamps();
         });

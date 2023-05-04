@@ -13,6 +13,7 @@ class Testimonial extends Model
         'testimonial',
         'name',
         'position',
+        'rating',
         'filename'
     ];
 }
